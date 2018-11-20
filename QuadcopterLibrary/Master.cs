@@ -24,34 +24,32 @@ namespace QuadcopterLibrary
 
         internal void SosAnswer(Quadcopter quadcopter)
         {
-            try
+            if (target == null)
             {
-                if (target == null)
+                if (quadcopter.Master == null)
                 {
-                    if (quadcopter.Master == null)
-                    {
-                        target = quadcopter;
-                        quadcopter.Master = this;
-                    }
-                    else if (Math.Abs(quadcopter.X - X) < Math.Abs(quadcopter.Master.X - quadcopter.X))
-                    {
-                        target = quadcopter;
-                        quadcopter.Master.target = null;
-                        quadcopter.Master = this;
-                    }
+                    target = quadcopter;
+                    quadcopter.Master = this;
                 }
-                else if (quadcopter.Master == null)
+                else if (Math.Abs(quadcopter.X - X) < Math.Abs(quadcopter.Master.X - quadcopter.X))
                 {
-                    if (Math.Abs(quadcopter.X - X) < Math.Abs(target.X - X))
-                    {
-                        target.Master = null;
-                        target = quadcopter;
-                        quadcopter.Master = this;
-                    }
+                    target = quadcopter;
+                    quadcopter.Master.target = null;
+                    quadcopter.Master = this;
                 }
             }
-            catch (Exception) { }
+            else if (quadcopter.Master == null)
+            {
+                if (Math.Abs(quadcopter.X - X) < Math.Abs(target.X - X))
+                {
+                    target.Master = null;
+                    target = quadcopter;
+                    quadcopter.Master = this;
+                }
+            }
         }
+        
+
         internal void TimeTick()
         {
             if (target == null)

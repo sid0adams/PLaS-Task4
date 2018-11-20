@@ -49,9 +49,9 @@ namespace QuadcopterLibrary
                 throw new Exception();
             Quadcopter quadcopter = new Quadcopter(Rnd, x, y, X, Y, radioSetting);
             quadcopters.Add(quadcopter);
-            TimeTickEvent += quadcopter.TimeTick;
+            TimeTickEvent += quadcopter.TimeTickAsynk;
             RadioEvent += quadcopter.SetAcceleration;
-            quadcopter.SosEvent += StartSosAsync;
+            quadcopter.SosEvent += StartSos;
         }
         public void AddMaster(int x)
         {
@@ -79,12 +79,13 @@ namespace QuadcopterLibrary
         }
 
 
-        internal async void StartSosAsync(Quadcopter quadcopter)
+        internal void StartSos(Quadcopter quadcopter)
         {
-            if(SosEvent!=null)
-            {
-                await Task.Run(() => SosEvent(quadcopter));
-            }
+            if (SosEvent != null)
+                lock (SosEvent)
+                {
+                    Task.Run(() => SosEvent(quadcopter));
+                }
         }
         internal async void StartRadioComandAsync(int radioSetting, double x, double y)
         {
@@ -115,7 +116,9 @@ namespace QuadcopterLibrary
                             }
                         }
                         catch (Exception) { }
+                Thread.Sleep(100);
             }
+            
         }
 
         public void Dispose()

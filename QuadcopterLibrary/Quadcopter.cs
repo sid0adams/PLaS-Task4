@@ -48,7 +48,7 @@ namespace QuadcopterLibrary
             AccelerationX = x * speed;
             AccelerationY = y * speed;
         }
-        public void TimeTick()
+        public async void TimeTickAsynk()
         {
             if (IsWorking)
             {
@@ -66,8 +66,8 @@ namespace QuadcopterLibrary
             {
                 if (Y > R)
                     Y--;
-                else //if (Master == null)
-                    SosEvent?.Invoke(this);
+                else if (Master == null || Math.Abs(X - Master.X) > R)
+                    await Task.Run(()=>SosEvent?.Invoke(this));
             }
         }
     }
